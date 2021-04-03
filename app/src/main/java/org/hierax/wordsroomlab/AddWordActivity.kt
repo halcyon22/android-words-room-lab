@@ -1,14 +1,10 @@
 package org.hierax.wordsroomlab
 
-import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
-import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import org.hierax.wordsroomlab.databinding.ActivityAddWordBinding
-import org.hierax.wordsroomlab.databinding.ActivityMainBinding
-import org.hierax.wordsroomlab.repository.Word
 
 class AddWordActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,17 +17,19 @@ class AddWordActivity : AppCompatActivity() {
         binding.buttonSave.setOnClickListener {
             val replyIntent = Intent()
             if (TextUtils.isEmpty(binding.textInputWord.text)) {
-                setResult(Activity.RESULT_CANCELED, replyIntent)
+                setResult(EMPTY_WORD, replyIntent)
             } else {
                 val word = binding.textInputWord.text.toString()
                 replyIntent.putExtra(EXTRA_REPLY, word)
-                setResult(Activity.RESULT_OK, replyIntent)
+                setResult(VALID_WORD, replyIntent)
             }
             finish()
         }
     }
 
     companion object {
-        const val EXTRA_REPLY = "com.example.android.wordlistsql.REPLY"
+        const val EXTRA_REPLY = "org.hierax.wordsroomlab.AddWordActivity.REPLY"
+        const val VALID_WORD = 1
+        const val EMPTY_WORD = 2
     }
 }

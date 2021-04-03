@@ -1,18 +1,21 @@
 package org.hierax.wordsroomlab
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.hierax.wordsroomlab.databinding.ActivityMainBinding
 import org.hierax.wordsroomlab.repository.Word
 
 class MainActivity : AppCompatActivity() {
-    private val newWordActivityRequestCode = 1
+    private val addWordLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(), this::addWordCallback)
 
     private val wordViewModel: WordViewModel by viewModels {
         WordViewModelFactory((application as WordsApplication).repository)
@@ -35,25 +38,24 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         binding.buttonAdd.setOnClickListener {
-
-            val intent = Intent(this@MainActivity, AddWordActivity::class.java)
-            startActivityForResult(intent, newWordActivityRequestCode)
+            addWordLauncher.launch(Intent(this@MainActivity, AddWordActivity::class.java))
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == newWordActivityRequestCode && resultCode == RESULT_OK) {
-            data?.getStringExtra(AddWordActivity.EXTRA_REPLY)?.let {
-                wordViewModel.insert(Word(it))
+    private fun addWordCallback(result : ActivityResult) {
+        when (result.resultCode) {
+            AddWordActivity.VALID_WORD -> {
+                result.data?.getStringExtra(AddWordActivity.EXTRA_REPLY)?.let {
+                    wordViewModel.insert(Word(it))
+                }
             }
-        } else {
-            Toast.makeText(
-                applicationContext,
-                R.string.empty_not_saved,
-                Toast.LENGTH_SHORT
-            ).show()
+            else -> {
+                Toast.makeText(
+                    applicationContext,
+                    R.string.empty_not_saved,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 }

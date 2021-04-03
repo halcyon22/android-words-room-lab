@@ -8,8 +8,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-// TODO exportSchema will write a schema definition file for version control
-@Database(entities = [Word::class], version = 1, exportSchema = false)
+@Database(entities = [Word::class], version = 1)
 abstract class WordRoomDatabase : RoomDatabase() {
 
     abstract fun wordDao(): WordDao
